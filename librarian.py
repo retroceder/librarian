@@ -8,7 +8,9 @@ from print_utils import colprint
 PROGRAM = 'Librarian'
 DESCRIPTION = 'Video library name manager'
 
-POSSIBLE_MOVIE_NAME_REGEX = r'^(?P<name>(\S+\.)*\S+)\.\S*(?P<year>\d{4})\S*(\d+p)\S*\.(?P<ext>mkv)$'
+# Incorrect movie name regex (to enable autocorrection)
+POSSIBLE_MOVIE_NAME_REGEX_LIST = [r'^(?P<name>(\S+\.)*\S+)\.\S*(?P<year>\d{4})\S*(\d+p)\S*\.(?P<ext>mkv)$']
+# Correct movie name regex
 MOVIE_NAME_REGEX = r'^((\S+\ )*(\S+)) \(\d+\)\.mkv$'
 
 if __name__ == '__main__':
@@ -36,19 +38,26 @@ if __name__ == '__main__':
             match = re.match(MOVIE_NAME_REGEX, filename)
 
             if match is None:
-                possible_match = re.match(POSSIBLE_MOVIE_NAME_REGEX, filename)
-                if possible_match is None:
-                    index['!follows']['!possible_applies'].append(path)
-                else:
-                    name = possible_match.group('name').replace('.', ' ')
-                    year = possible_match.group('year')
-                    ext = possible_match.group('ext')
-                    possible_name = '{} ({}).{}'.format(name, year, ext)
+                matched = False
+                for possible_regex in POSSIBLE_MOVIE_NAME_REGEX_LIST:
+                    possible_match = re.match(possible_regex, filename)
+                    if possible_match is not None:
+                        name = possible_match.group('name').replace('.', ' ')
+                        year = possible_match.group('year')
+                        ext = possible_match.group('ext')
+                        possible_name = '{} ({}).{}'.format(name, year, ext)
 
-                    index['!follows']['possible_applies'].append((path, possible_name))
+                        index['!follows']['possible_applies'].append((path, possible_name))
+
+                        matched = True
+                        break
+
+                if not matched:
+                    index['!follows']['!possible_applies'].append(path)
             else:
                 index['follows'].append(path)
 
+        # Print file index
         if len(index['follows']) > 0 and args.print_follows:
             colprint('|sbr|List of files that |cgr|follow |crst|naming rules:')
             for path in index['follows']:
