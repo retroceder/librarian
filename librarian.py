@@ -5,7 +5,7 @@ import os
 import re
 import sys
 from argparse import ArgumentParser
-from pathlib import Path
+from pathlib import PurePath as Path
 
 import colorama
 from colorama import Fore
@@ -41,8 +41,8 @@ def colprint(text: str):
 
 
 # Get file index for a given root path
-def get_index(path: str):
-    all_files = [Path(entry) for entry in glob.glob(path + '*', recursive=True) if not os.path.isdir(entry)]
+def get_index(path: Path):
+    all_files = [Path(entry) for entry in glob.glob('./*', root_dir=path, recursive=True) if not os.path.isdir(entry)]
 
     index = {'follows': [], '!follows': {'possible_applies': [], '!possible_applies': []}}
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     # Parse args
     args = parser.parse_args()
     mode = args.mode
-    path = args.path
+    path = Path(args.path)
 
     if mode == 'check':
         colprint('|sbr|{} ({}) |cgr|CHECK MODE'.format(PROGRAM, DESCRIPTION))
