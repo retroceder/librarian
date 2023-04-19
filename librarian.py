@@ -13,8 +13,11 @@ from colorama import Style
 PROGRAM = 'Librarian'
 DESCRIPTION = 'Video library name manager'
 
+# Acknowledged file extensions
+FILE_EXTENSIONS = {'mkv', 'mp4'}
 # Incorrect movie name regex (to enable autocorrection)
-POSSIBLE_MOVIE_NAME_REGEX_LIST = [r'^(?P<name>(\S+\.)*\S+)\.\S*(?P<year>\d{4})\S*(\d+p)\S*\.(?P<ext>mkv)$']
+POSSIBLE_MOVIE_NAME_REGEX_LIST = [r'^(?P<name>(\S+\.)*\S+)\.\S*(?P<year>\d{4})\S*(\d+p)\S*\.(?P<ext>' +
+                                  '|'.join(FILE_EXTENSIONS) + ')$']
 # Correct movie name regex
 MOVIE_NAME_REGEX = r'^((\S+\ )*(\S+)) \(\d+\)\.mkv$'
 
