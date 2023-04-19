@@ -1,5 +1,5 @@
 # Librarian
-A script for checking video library file naming convention.
+A script for checking and enforcing video library file naming convention.
 
 ## Usage
 ### Check mode (no action)
@@ -11,4 +11,11 @@ python librarian.py --mode check <path>  # path - root directory of video librar
 By default script doesn't print filenames that follow naming convention. This can be changed by running:
 ```sh
 python librarian.py --mode check --print-follows <path>  # path - root directory of video library
+```
+
+## Usage
+### Correction mode
+To enforce naming convention (i.e. automatticaly rename files), run:
+```sh
+python librarian.py --mode correct <path>  # path - root directory of video library
 ```
