@@ -41,14 +41,14 @@ def colprint(text: str):
 
 
 # Get file index for a given root path
-def get_index(path: Path):
-    all_files = [Path(entry) for entry in glob.glob('./*', root_dir=path, recursive=True) if not os.path.isdir(entry)]
+def get_index(root_path: Path):
+    all_files = [Path(entry) for entry in glob.glob('./*', root_dir=root_path, recursive=True) if not os.path.isdir(entry)]
 
     index = {'follows': [], '!follows': {'possible_applies': [], '!possible_applies': []}}
 
-    colprint('Found total of |cgr||sbr|{}|rst| files in directory: |cgr||sbr|{}'.format(len(all_files), path))
-    for path in all_files:
-        filename = os.path.basename(path)
+    colprint('Found total of |cgr||sbr|{}|rst| files in directory: |cgr||sbr|{}'.format(len(all_files), root_path))
+    for relpath in all_files:
+        filename = os.path.basename(root_path / relpath)
 
         match = re.match(MOVIE_NAME_REGEX, filename)
 
@@ -62,15 +62,15 @@ def get_index(path: Path):
                     ext = possible_match.group('ext')
                     possible_name = '{} ({}).{}'.format(name, year, ext)
 
-                    index['!follows']['possible_applies'].append((path, possible_name))
+                    index['!follows']['possible_applies'].append((root_path / relpath, possible_name))
 
                     matched = True
                     break
 
             if not matched:
-                index['!follows']['!possible_applies'].append(path)
+                index['!follows']['!possible_applies'].append(root_path / relpath)
         else:
-            index['follows'].append(path)
+            index['follows'].append(root_path / relpath)
 
     return index
 
@@ -148,7 +148,6 @@ if __name__ == '__main__':
             for path, suggestion in index['!follows']['possible_applies']:
                 filename = os.path.basename(path)
                 colprint('Renaming |crd|{}|crst| -> |cgr|{}'.format(filename, suggestion))
-                # print('{} -> {}'.format(path, path.parent / suggestion))
                 os.rename(path, path.parent / suggestion)
 
         else:
