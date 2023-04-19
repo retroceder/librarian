@@ -16,14 +16,14 @@ PROGRAM = 'Librarian'
 DESCRIPTION = 'Video library name manager'
 
 # Acknowledged file extensions
-FILE_EXTENSIONS = {'mkv', 'mp4', 'avi', 'wmv'}
+FILE_EXTENSIONS_REGEX = '(mkv|mp4)|(avi|wmv)'
 # Incorrect movie name regex (to enable autocorrection)
 POSSIBLE_MOVIE_NAME_REGEX_LIST = [r'^(?P<name>(\S+\.)*\S+)\.(?P<year>\d{4})\S*(\d+p)\S*\.(?P<ext>' +
-                                  '|'.join(FILE_EXTENSIONS) + ')$',
+                                  FILE_EXTENSIONS_REGEX + ')$',
                                   r'^(?P<name>([^( ]+\ )*[^( ]+)\s\({0,1}(?P<year>\d{4})\({0,1}.*\.(?P<ext>' +
-                                  '|'.join(FILE_EXTENSIONS) + ')$']
+                                  FILE_EXTENSIONS_REGEX + ')$']
 # Correct movie name regex
-MOVIE_NAME_REGEX = r'^((\S+\ )*(\S+)) \(\d+\)\.mkv$'
+MOVIE_NAME_REGEX = r'^((\S+\ )*(\S+)) \(\d+\)\.' + FILE_EXTENSIONS_REGEX + '$'
 
 
 # Process colprint formatted strings (replace colorama-specific symbols)
