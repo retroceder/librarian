@@ -16,7 +16,7 @@ PROGRAM = 'Librarian'
 DESCRIPTION = 'Video library name manager'
 
 # Acknowledged file extensions
-FILE_EXTENSIONS = {'mkv', 'mp4'}
+FILE_EXTENSIONS = {'mkv', 'mp4', 'avi', 'wmv'}
 # Incorrect movie name regex (to enable autocorrection)
 POSSIBLE_MOVIE_NAME_REGEX_LIST = [r'^(?P<name>(\S+\.)*\S+)\.\S*(?P<year>\d{4})\S*(\d+p)\S*\.(?P<ext>' +
                                   '|'.join(FILE_EXTENSIONS) + ')$']
