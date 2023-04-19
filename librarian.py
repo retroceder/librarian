@@ -44,7 +44,8 @@ def colprint(text: str):
 
 # Get file index for a given root path
 def get_index(root_path: Path):
-    all_files = [Path(entry) for entry in glob.glob('./*', root_dir=root_path, recursive=True) if not os.path.isdir(entry)]
+    all_files = [Path(entry) for entry in glob.glob('./*', root_dir=root_path, recursive=True)
+                 if not os.path.isdir(root_path / entry)]
 
     index = {'follows': [], '!follows': {'possible_applies': [], '!possible_applies': []}}
 
