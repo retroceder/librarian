@@ -3,8 +3,11 @@ import os
 import re
 from argparse import ArgumentParser
 
-from print_utils import colprint
+import colorama
+from colorama import Fore
+from colorama import Style
 
+# Program related constants
 PROGRAM = 'Librarian'
 DESCRIPTION = 'Video library name manager'
 
@@ -13,7 +16,28 @@ POSSIBLE_MOVIE_NAME_REGEX_LIST = [r'^(?P<name>(\S+\.)*\S+)\.\S*(?P<year>\d{4})\S
 # Correct movie name regex
 MOVIE_NAME_REGEX = r'^((\S+\ )*(\S+)) \(\d+\)\.mkv$'
 
+
+# Process colprint formatted strings (replace colorama-specific symbols)
+def colprocess(text: str):
+    return text\
+        .replace('|sbr|', Style.BRIGHT)\
+        .replace('|sdm|', Style.DIM)\
+        .replace('|rst|', Style.RESET_ALL)\
+        .replace('|crst|', Fore.RESET)\
+        .replace('|cgr|', Fore.GREEN)\
+        .replace('|crd|', Fore.RED)
+
+
+# Print specially formatted colored strings
+def colprint(text: str):
+    print(colprocess(text) + Style.RESET_ALL)
+
+
+# Entry point
 if __name__ == '__main__':
+    # Initialization
+    colorama.init()
+
     # Setup arguments
     parser = ArgumentParser(prog=PROGRAM, description=DESCRIPTION)
     parser.add_argument('--mode', choices=['check'], required=True)
