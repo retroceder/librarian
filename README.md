@@ -13,7 +13,6 @@ By default script doesn't print filenames that follow naming convention. This ca
 python librarian.py --mode check --print-follows <path>  # path - root directory of video library
 ```
 
-## Usage
 ### Correction mode
 To enforce naming convention (i.e. automatticaly rename files), run:
 ```sh
