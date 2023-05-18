@@ -4,8 +4,8 @@ import os
 from pathlib import PurePath as Path
 
 
-# Get file index for a given root path
 def get_index(root_path: Path, movie_regex: str, possible_movie_regex: list):
+    """Get file index for a given root path."""
     all_files = [Path(entry) for entry in glob.glob(str(root_path) + '/*', recursive=True)
                  if not os.path.isdir(root_path / entry)]
 

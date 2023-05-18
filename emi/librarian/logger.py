@@ -15,12 +15,12 @@ COLOR_EXTENSIONS = [
 
 
 def local_time_str():
-    """Метод получения отформатированного локального времени."""
+    """Get formatted datetime."""
     return time.strftime("%d %b %Y %H:%M:%S", time.localtime())
 
 
 def process_color_extensions(text: str):
-    """Обработка цветовых расширений текста."""
+    """Text color extensions' substitution (according to colorama)."""
     for params in COLOR_EXTENSIONS:
         text = text.replace('<{}>'.format(params["ext"]), params["sub_open"])
         text = text.replace('</{}>'.format(params["ext"]), params["sub_close"])
@@ -29,7 +29,7 @@ def process_color_extensions(text: str):
 
 
 def remove_color_extensions(text: str):
-    """Удаление цветовых расширений текста."""
+    """Text color extensions' removal."""
     for params in COLOR_EXTENSIONS:
         text = text.replace('<{}>'.format(params["ext"]), "")
         text = text.replace('</{}>'.format(params["ext"]), "")
@@ -38,19 +38,19 @@ def remove_color_extensions(text: str):
 
 
 class Logger:
-    """Объект для синхронизированного вывода в консоль."""
+    """Object for synchronized console output"""
     def __init__(self, add_timestamp=False):
-        """Конструктор.
+        """Constructor.
 
-        Аргументы:
-        path -- путь до файла журнала
+        Arguments:
+        add_timestamp -- Add current datetime to beginning of console outputs
         """
         self.lock = Lock()
         self.add_timestamp = add_timestamp
         colorama.init()
 
     def log(self, message: str, end: str = '\n'):
-        """Синхронизированная запись в журнал (консоль)."""
+        """Synchronized console output."""
         with self.lock:
             print(process_color_extensions("{}{}".format('[{}] '.format(local_time_str()) if self.add_timestamp else '',
                                                          message)), end=end)
