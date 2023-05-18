@@ -30,7 +30,7 @@ librarian --mode check --print-follows <path>  # path - root directory of video 
 ```
 
 ### Correction mode
-To enforce naming convention (i.e. automatticaly rename files), run:
+To enforce naming convention (i.e. automatically rename files), run:
 ```shell
 librarian --mode correct <path>  # path - root directory of video library
 ```
