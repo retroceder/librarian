@@ -1,0 +1,107 @@
+#!/usr/bin/python3
+
+import glob
+import os
+import re
+import sys
+from argparse import ArgumentParser
+from pathlib import PurePath as Path
+
+from emi.librarian import get_index, Logger
+
+# Program related constants
+PROGRAM = 'Librarian'
+DESCRIPTION = 'Video library name manager'
+
+# Acknowledged file extensions
+FILE_EXTENSIONS_REGEX = '(mkv|mp4)|(avi|wmv)'
+# Incorrect movie name regex (to enable autocorrection)
+POSSIBLE_MOVIE_NAME_REGEX_LIST = [r'^(?P<name>(\S+\.)*\S+)\.(?P<year>\d{4})\S*(\d+p)\S*\.(?P<ext>' +
+                                  FILE_EXTENSIONS_REGEX + ')$',
+                                  r'^(?P<name>([^( ]+\ )*[^( ]+)\s\({0,1}(?P<year>\d{4})\({0,1}.*\.(?P<ext>' +
+                                  FILE_EXTENSIONS_REGEX + ')$']
+# Correct movie name regex
+MOVIE_NAME_REGEX = r'^((\S+\ )*(\S+)) \(\d+\)\.' + FILE_EXTENSIONS_REGEX + '$'
+
+
+# Entry point
+if __name__ == '__main__':
+    # Setup arguments
+    parser = ArgumentParser(prog=PROGRAM, description=DESCRIPTION)
+    parser.add_argument('--mode', choices=['check', 'correct'], required=True)
+    parser.add_argument('--print-follows', action='store_true', default=False)
+    parser.add_argument('path')
+
+    # Parse args
+    args = parser.parse_args()
+    mode = args.mode
+    path = Path(args.path)
+
+    logger = Logger(add_timestamp=False)
+
+    if mode == 'check':
+        logger.log('<br>{} ({}) <gr>CHECK MODE</gr></br>'.format(PROGRAM, DESCRIPTION))
+
+        index, total_files = get_index(path, movie_regex=MOVIE_NAME_REGEX,
+                                       possible_movie_regex=POSSIBLE_MOVIE_NAME_REGEX_LIST)
+        logger.log('Found total of <gr>{}</gr> files in directory: <br>{}</br>'.format(total_files, path))
+
+        # Print file index
+        if len(index['follows']) > 0 and args.print_follows:
+            logger.log('<br>List of files that <gr>follow</gr> naming rules:</br>')
+            for path in index['follows']:
+                filename = os.path.basename(path)
+                logger.log(filename)
+            logger.log('')
+
+        if len(index['!follows']['possible_applies']):
+            logger.log('<br>List of files that <rd>don\'t follow</rd> naming rules, but <gr>can be automatically '
+                       'renamed</gr>:</br>')
+            for path, suggestion in index['!follows']['possible_applies']:
+                filename = os.path.basename(path)
+                logger.log('<rd>{}</rd> -> <gr>{}</gr>'.format(filename, suggestion))
+            logger.log('')
+
+        if len(index['!follows']['!possible_applies']):
+            logger.log('<br>List of files that <rd>don\'t follow</rd> naming rules and <rd>can\'t be automatically '
+                       'renamed</rd>:</br>')
+            for path in index['!follows']['!possible_applies']:
+                filename = os.path.basename(path)
+                logger.log(filename)
+
+    if mode == 'correct':
+        logger.log('<br>{} ({}) <gr>CORRECTION MODE</gr></br>'.format(PROGRAM, DESCRIPTION))
+
+        index, total_files = get_index(path, movie_regex=MOVIE_NAME_REGEX,
+                                       possible_movie_regex=POSSIBLE_MOVIE_NAME_REGEX_LIST)
+        logger.log('Found total of <gr>{}</gr> files in directory: <br>{}</br>'.format(total_files, path))
+
+        if len(index['!follows']['possible_applies']):
+            logger.log('<br>List of files that <rd>don\'t follow</rd> naming rules, but <gr>can be automatically '
+                       'renamed</gr>:</br>')
+            for path, suggestion in index['!follows']['possible_applies']:
+                filename = os.path.basename(path)
+                logger.log('<rd>{}</rd> -> <gr>{}</gr>'.format(filename, suggestion))
+            logger.log('')
+
+            proceed = None
+            while proceed is None:
+                logger.log('Do you wish to proceed? (Y/N): ', end='')
+                ans = input()
+
+                if ans == 'Y':
+                    proceed = True
+                if ans == 'N':
+                    proceed = False
+
+            if not proceed:
+                logger.log('<br><rd>Abort</rd></br>')
+                sys.exit(1)
+
+            for path, suggestion in index['!follows']['possible_applies']:
+                filename = os.path.basename(path)
+                logger.log('Renaming <rd>{}</rd> -> <gr>{}</gr>'.format(filename, suggestion))
+                os.rename(path, path.parent / suggestion)
+
+        else:
+            logger.log('<br><gr>There are no files that can be automatically corrected.</gr></br>')
