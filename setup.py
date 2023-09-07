@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='librarian',
-      version='0.1.0',
+      version='0.1.1',
       description='Video library name manager',
       url='https://github.com/retroceder/librarian',
       author='Maxim Gomozov',
